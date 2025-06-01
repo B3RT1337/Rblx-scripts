@@ -128,11 +128,11 @@ end
 
 -- Close functionality: Destroys the script
 closeButton.MouseButton1Click:Connect(function()
-	local scriptParent = script.Parent
-	if scriptParent then
-		script:Destroy()
+	if screenGui then
+		screenGui:Destroy()
 	end
 end)
+
 
 -- Title with drag functionality (adjusted to not overlap with close button)
 local title = Instance.new("TextLabel")
