@@ -24,7 +24,7 @@ end
 -- Circular Toggle Button (larger on mobile)
 local toggleBtn = Instance.new("ImageButton")
 toggleBtn.Name = "CircleToggle"
-toggleBtn.Image = "rbxassetid://2549575201"
+toggleBtn.Image = "rbxassetid://16022860575"
 toggleBtn.ImageColor3 = Color3.fromRGB(70, 70, 70)
 toggleBtn.ScaleType = Enum.ScaleType.Slice
 toggleBtn.SliceCenter = Rect.new(100, 100, 100, 100)
@@ -34,7 +34,7 @@ toggleBtn.AnchorPoint = Vector2.new(0, 0.5)
 toggleBtn.Parent = screenGui
 
 local toggleIcon = Instance.new("ImageLabel")
-toggleIcon.Image = "rbxassetid://2549575201"
+toggleIcon.Image = "rbxassetid://16022860575"
 toggleIcon.ImageRectOffset = Vector2.new(324, 364)
 toggleIcon.ImageRectSize = Vector2.new(36, 36)
 toggleIcon.Size = UDim2.new(0.6, 0, 0.6, 0)
@@ -74,8 +74,8 @@ end)
 
 -- Menu Frame (larger on mobile)
 local menuFrame = Instance.new("Frame")
-menuFrame.Size = isMobile and UDim2.new(0, 350, 0, 300) or UDim2.new(0, 320, 0, 220)
-menuFrame.Position = UDim2.new(0.5, -175, 0.5, -150)
+menuFrame.Size = isMobile and UDim2.new(0, 350, 0, 220) or UDim2.new(0, 320, 0, 220)
+menuFrame.Position = UDim2.new(0.5, -175, 0.5, -10)
 menuFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 menuFrame.Visible = false
 menuFrame.Parent = screenGui
