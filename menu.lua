@@ -411,17 +411,28 @@ local function startFlying()
 	local hrp = getHumanoidRootPart()
 	if not hrp then return end
 
-	local bodyVelocity = Instance.new("BodyVelocity")
+	-- Remove existing flight parts if they exist
+	if bodyVelocity then bodyVelocity:Destroy() end
+	if bodyGyro then bodyGyro:Destroy() end
+
+	-- Method 1: BodyVelocity + BodyGyro (Standard Roblox Flying)
+	bodyVelocity = Instance.new("BodyVelocity")
 	bodyVelocity.Name = "FlyVelocity"
 	bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
 	bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+	bodyVelocity.P = 10000 -- Higher P for smoother movement
 	bodyVelocity.Parent = hrp
 
-	local bodyGyro = Instance.new("BodyGyro")
+	bodyGyro = Instance.new("BodyGyro")
 	bodyGyro.Name = "FlyGyro"
 	bodyGyro.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
 	bodyGyro.CFrame = hrp.CFrame
+	bodyGyro.P = 10000
 	bodyGyro.Parent = hrp
+
+	-- Method 2: CFrame Manipulation (Fallback if BodyVelocity is removed)
+	local flyCFrameFallback = false
+	local lastCFrame = hrp.CFrame
 
 	-- Start swimming animation
 	swimAnimationTrack = loadSwimAnimation()
@@ -430,39 +441,51 @@ local function startFlying()
 		swimAnimationTrack.Looped = true
 	end
 
-	local flyingConnection
-	local velocity = Vector3.new(0, 0, 0)
-
-	flyingConnection = game:GetService("RunService").Heartbeat:Connect(function()
+	flyingConnection = game:GetService("RunService").Heartbeat:Connect(function(dt)
 		local moveDirection = Vector3.new()
 		local inputService = game:GetService("UserInputService")
 
-		if inputService:IsKeyDown(Enum.KeyCode.W) or (isMobile and inputService:IsKeyDown(Enum.KeyCode.ButtonY)) then
+		-- Movement controls (WASD + Space/Shift)
+		if inputService:IsKeyDown(Enum.KeyCode.W) then
 			moveDirection = moveDirection + workspace.CurrentCamera.CFrame.LookVector
 		end
-		if inputService:IsKeyDown(Enum.KeyCode.S) or (isMobile and inputService:IsKeyDown(Enum.KeyCode.ButtonA)) then
+		if inputService:IsKeyDown(Enum.KeyCode.S) then
 			moveDirection = moveDirection - workspace.CurrentCamera.CFrame.LookVector
 		end
-		if inputService:IsKeyDown(Enum.KeyCode.A) or (isMobile and inputService:IsKeyDown(Enum.KeyCode.ButtonX)) then
+		if inputService:IsKeyDown(Enum.KeyCode.A) then
 			moveDirection = moveDirection - workspace.CurrentCamera.CFrame.RightVector
 		end
-		if inputService:IsKeyDown(Enum.KeyCode.D) or (isMobile and inputService:IsKeyDown(Enum.KeyCode.ButtonB)) then
+		if inputService:IsKeyDown(Enum.KeyCode.D) then
 			moveDirection = moveDirection + workspace.CurrentCamera.CFrame.RightVector
 		end
-		if inputService:IsKeyDown(Enum.KeyCode.Space) or (isMobile and inputService:IsKeyDown(Enum.KeyCode.ButtonR2)) then
+		if inputService:IsKeyDown(Enum.KeyCode.Space) then
 			moveDirection = moveDirection + Vector3.new(0, 1, 0)
 		end
-		if inputService:IsKeyDown(Enum.KeyCode.LeftShift) or (isMobile and inputService:IsKeyDown(Enum.KeyCode.ButtonL2)) then
+		if inputService:IsKeyDown(Enum.KeyCode.LeftShift) then
 			moveDirection = moveDirection - Vector3.new(0, 1, 0)
 		end
 
-		velocity = moveDirection.Unit * flightSpeed
-		if moveDirection.Magnitude == 0 then
-			velocity = Vector3.new(0, 0, 0)
+		-- Normalize and apply speed
+		if moveDirection.Magnitude > 0 then
+			moveDirection = moveDirection.Unit * flightSpeed
 		end
 
-		bodyVelocity.Velocity = velocity
-		bodyGyro.CFrame = workspace.CurrentCamera.CFrame
+		-- Check if BodyVelocity was removed (anti-cheat)
+		if not hrp:FindFirstChild("FlyVelocity") and not flyCFrameFallback then
+			flyCFrameFallback = true
+			warn("[Flight] BodyVelocity removed, switching to CFrame method")
+		end
+
+		-- Apply movement
+		if flyCFrameFallback then
+			-- Fallback: Direct CFrame manipulation (less smooth but harder to block)
+			hrp.CFrame = hrp.CFrame + (moveDirection * dt)
+			hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0) -- Stop physics drift
+		else
+			-- Standard BodyVelocity method
+			bodyVelocity.Velocity = moveDirection
+			bodyGyro.CFrame = workspace.CurrentCamera.CFrame
+		end
 	end)
 
 	return flyingConnection, bodyVelocity, bodyGyro
