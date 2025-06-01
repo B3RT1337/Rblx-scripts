@@ -76,7 +76,7 @@ end)
 -- Menu Frame (larger on mobile)
 local menuFrame = Instance.new("Frame")
 menuFrame.Size = isMobile and UDim2.new(0, 350, 0, 230) or UDim2.new(0, 320, 0, 230)
-menuFrame.Position = UDim2.new(0.5, 300, 0.5, -10)
+menuFrame.Position = UDim2.new(0.5, 250, 0.5, -10)
 menuFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 menuFrame.Visible = false
 menuFrame.Parent = screenGui
