@@ -72,6 +72,7 @@ toggleBtn.InputChanged:Connect(function(input)
 	end
 end)
 
+
 -- Menu Frame (larger on mobile)
 local menuFrame = Instance.new("Frame")
 menuFrame.Size = isMobile and UDim2.new(0, 350, 0, 230) or UDim2.new(0, 320, 0, 230)
@@ -89,14 +90,59 @@ local menuCorner = Instance.new("UICorner")
 menuCorner.CornerRadius = UDim.new(0, 8)
 menuCorner.Parent = menuFrame
 
--- Title with drag functionality (larger text on mobile)
+-- Add Close Button (X) in top-right corner
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Text = "X"
+closeButton.Size = isMobile and UDim2.new(0, 40, 0, 40) or UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -10, 0, 10)
+closeButton.AnchorPoint = Vector2.new(1, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 60, 60) -- Red color
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = isMobile and 20 or 18
+closeButton.ZIndex = 2
+closeButton.Parent = menuFrame
+
+-- Rounded corners for close button
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(1, 0) -- Fully round
+closeCorner.Parent = closeButton
+
+-- Hover effects for close button
+if not isMobile then
+	closeButton.MouseEnter:Connect(function()
+		game:GetService("TweenService"):Create(closeButton, TweenInfo.new(0.2), {
+			BackgroundColor3 = Color3.fromRGB(220, 80, 80),
+			Size = isMobile and UDim2.new(0, 42, 0, 42) or UDim2.new(0, 32, 0, 32)
+		}):Play()
+	end)
+
+	closeButton.MouseLeave:Connect(function()
+		game:GetService("TweenService"):Create(closeButton, TweenInfo.new(0.2), {
+			BackgroundColor3 = Color3.fromRGB(200, 60, 60),
+			Size = isMobile and UDim2.new(0, 40, 0, 40) or UDim2.new(0, 30, 0, 30)
+		}):Play()
+	end)
+end
+
+-- Close functionality: Destroys the script
+closeButton.MouseButton1Click:Connect(function()
+	local scriptParent = script.Parent
+	if scriptParent then
+		script:Destroy()
+	end
+end)
+
+-- Title with drag functionality (adjusted to not overlap with close button)
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, isMobile and 50 or 40)
+title.Size = UDim2.new(0.85, 0, 0, isMobile and 50 or 40) -- Reduced width
+title.Position = UDim2.new(0.075, 0, 0, 0) -- Centered with offset
 title.BackgroundTransparency = 1
 title.Text = "Boost Menu ◈ Made By B3RT1337"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.GothamBold
-title.TextSize = isMobile and 24 or 20
+title.TextSize = isMobile and 15 or 15
 title.TextXAlignment = Enum.TextXAlignment.Center
 title.Parent = menuFrame
 
